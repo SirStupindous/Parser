@@ -27,36 +27,35 @@ class Parser:
         """
         # self.token_stream.append(0)
         table_string = self.__read_file_as_string(parse_table_file)
-        # rows = table_string.split('\n')
-        # # line1data = rows[0].rstrip().split(',')
-        # # print(line1data)
+        rows = table_string.split('\n')
+        line1data = rows[0].rstrip().split(',')
+        print(line1data)
         parse_table = {}
-        # for i in range(0,len(rows)):
-        # # while self.token_stream is not None:
-        #     # line_tuple = rows[i].split(',')
-        #     # state = line_tuple[0]
-        #     # print("state " + state)
-        #     # token = line1data[i]
-        #     # print("token " + token)
-        #     state = i
-        #     print(i)
-        #     token = self.__get_next_token()
-        #     print(token)
-        #     x = parse_table[state, token]
-        #     match x:
-        #         case ['S', i]:
-        #             x.append(i)
-        #             x.append(state)
-        #         case ['R', i]:
-        #             L = i + 1
-        #             x.pop(L)
-        #             Qj = state
-        #             x.append(L)
-        #             x.append(parse_table[Qj, L])
-        #         case ["ACCT", i]:
-        #             print("Parsing is complete")
-        #         case None:
-        #             print("Error in parsing")
+        while self.token_stream is not None:
+            line_tuple = rows[i].split(',')
+            state = line_tuple[0]
+            print("state " + state)
+            token = line1data[i]
+            print("token " + token)
+            state = i
+            print(i)
+            token = self.__get_next_token()
+            print(token)
+            x = parse_table[state, token]
+            match x:
+                case ['S', i]:
+                    x.append(i)
+                    x.append(state)
+                case ['R', i]:
+                    L = i + 1
+                    x.pop(L)
+                    Qj = state
+                    x.append(L)
+                    x.append(parse_table[Qj, L])
+                case ["ACCT", i]:
+                    print("Parsing is complete")
+                case None:
+                    print("Error in parsing")
         return parse_table
         # raise NotImplementedError()
 
@@ -79,8 +78,7 @@ class Parser:
 
     def parse(self):
         print(self.__get_next_token())
-        """self.token_stream.push(0)"""
-        # return(self.__read_parse_table())
+        self.token_stream.append(0)
         # raise NotImplementedError()
     
     def __read_file_as_string(self, parse_table_file):
