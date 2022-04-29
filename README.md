@@ -5,7 +5,7 @@ This is our project.
 
 ## Team members and emails
 
-Alan Turing (aturing@dcaron.xyz)
+Nicholas Ayson (nick.ayson@csu.fullerton.edu)
 
 ## How to compile and execute
 

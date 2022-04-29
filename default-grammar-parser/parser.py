@@ -26,31 +26,39 @@ class Parser:
         @return A dictionary/map (state, symbol) -> action/goto.
         """
         self.token_stream.append(0)
+        table_string = self.__read_file_as_string(parse_table_file)
+        rows = table_string.split('\n')
         # line1data = rows[0].rstrip().split(',')
-        
-        # table_string = read_file_as_string(parse_table_file)
-        # rows = table_string.split('\n')
+        # print(line1data)
         parse_table = {}
-        for i in range(0,10):
-            # line_tuple = parse_table.split(',')
-            state = int(self.token_stream[0])
-            token = str(self.token_stream[1])
+        for i in range(0,len(rows)):
+        # while self.token_stream is not None:
+            # line_tuple = rows[i].split(',')
+            # state = line_tuple[0]
+            # print("state " + state)
+            # token = line1data[i]
+            # print("token " + token)
+            state = i
+            print(i)
+            token = self.__get_next_token()
+            print(token)
             x = parse_table[state, token]
             match x:
                 case ['S', i]:
-                    parse_table.append(i)
-                    parse_table.append(state)
+                    x.append(i)
+                    x.append(state)
                 case ['R', i]:
                     L = i + 1
-                    parse_table.pop(L)
+                    x.pop(L)
                     Qj = state
-                    parse_table.append(L)
-                    parse_table.append(parse_table[Qj, L])
+                    x.append(L)
+                    x.append(parse_table[Qj, L])
                 case ["ACCT", i]:
                     print("Parsing is complete")
                 case None:
                     print("Error in parsing")
-        return parse_table
+        return x
+        # raise NotImplementedError()
 
     def __has_next_token(self):
         """
@@ -65,8 +73,6 @@ class Parser:
         """
         if self.__has_next_token():
             to_return = self.token_stream[0]
-            print(self.token_stream[1])
-            print("line 70")
             self.token_stream.pop(0)
             return to_return
         return None
@@ -74,5 +80,37 @@ class Parser:
     def parse(self):
         print(self.__get_next_token())
         """self.token_stream.push(0)"""
-        return(self.__read_parse_table())
+        # return(self.__read_parse_table(self.parser_table))
         # raise NotImplementedError()
+    
+    def __read_file_as_string(self, parse_table_file):
+        """
+        Reads the provided file as a string.
+        @param filename: Name of the file to read.
+        @return: A string of the files contents.
+        """
+        with open(parse_table_file, 'r') as file_pointer:
+            return file_pointer.read()
+        
+        
+# token = next_token()
+
+# repeat forever
+#    s = top of stack
+   
+#    if action[s, token] = “shift si” then
+#       PUSH token
+#       PUSH si 
+#       token = next_token()
+      
+#    else if action[s, token] = “reduce A::= β“ then 
+#       POP 2 * |β| symbols
+#       s = top of stack
+#       PUSH A
+#       PUSH goto[s,A]
+      
+#    else if action[s, token] = “accept” then
+#       return
+      
+#    else
+#       error()
