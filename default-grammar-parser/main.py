@@ -48,7 +48,7 @@ lexical_table[(4, '\t')] = 4
 token_table = {}
 token_table[1] = "id"
 token_table[2] = "+"
-token_table[3] = "-"
+token_table[3] = "="
 token_table[4] = "whitespace"
 
 # Construct the lexer from the parsed file outputs from the parser.
