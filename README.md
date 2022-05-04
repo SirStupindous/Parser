@@ -17,7 +17,7 @@ In default grammar for assignment 2:
 
 For Assignment 1: assignment1.png  
 
-[grab-landing-page](https://github.com/CSUF-CPSC-Caron-SP22/parsing-project-ne/blob/master/assignment1.PNG)
+![grab-landing-page](https://github.com/CSUF-CPSC-Caron-SP22/parsing-project-ne/blob/master/assignment1.PNG)
   
 For Assignment 2: output.txt  
 
