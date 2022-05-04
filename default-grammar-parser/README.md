@@ -12,4 +12,5 @@ You must have a recent version of Python3 installed.
 
 ```
 python3 main.py [sourcecode]
+python3 main.py code.txt
 ```
