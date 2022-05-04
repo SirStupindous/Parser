@@ -106,6 +106,7 @@ class Parser:
         return None
 
     def parse(self):
+        print("(State, Symbol)")
         print(self.token_stream)
         # tokens = self.token_stream
         # individual_token = tokens[0]
@@ -113,7 +114,7 @@ class Parser:
         # print("individual token = " + individual_token[0])
         
         self.states = [0]
-        self.symbols = [('$',None)]
+        self.symbols = [('$')]
         tokens = self.token_stream # Creates a list of all the tokens from the input.
         i=0
 
@@ -162,6 +163,7 @@ class Parser:
         # for i in range(prod_len):
         # print(prod_len)
         if(action[1] == 3): 
+            print("Production Step: E -> E + id" )
             self.states.pop(-1)
             self.states.pop(-1)
             self.states.pop(-1)
@@ -173,6 +175,7 @@ class Parser:
             self.states.append(9)
         
         if(action[1] == 1):
+            print("Production Step: S -> E = E" )
             self.states.pop(-1)
             self.states.pop(-1)
             self.states.pop(-1)
@@ -182,6 +185,13 @@ class Parser:
             
             self.states.append(1)
             
+        if(action[1] == 4):
+            print("Production Step: E -> id") 
+            
+        
+        if(action[1] == 2):
+            print("Production Step: S -> id") 
+      
         self.states.pop(-1)
         popped.insert(0, self.symbols.pop(-1))
         
