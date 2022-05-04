@@ -8,20 +8,55 @@
 # Be sure to show the stack, input, and action performed for each step of the parsing. 
 # If there is an error, terminate the parsing and display a useful error message along with what tokens would have been accepted for a valid parsing. 
 # Paste the results of the parsing into a text file.
+# from lexer import Lexer, __get_token
+
+from csv import reader
+from secrets import token_urlsafe
+from lexer import Lexer
+
+SHIFT = 1
+REDUCE = 2
+STOP = 3
+ACCEPT = 4
+
+PRODUCTIONS = {
+    1:"S -> E = E",
+    2:"S -> id",
+    3:"E -> E + id",
+    4:"E -> id",
+}
+
+def get_action(act: str):
+    '''
+    A simple function to return action along with required information
+    (Example: Which production to use or Which state to shift).
+    '''
+    if not act:
+        return (STOP, None)
+    elif act == 'ACCT':
+        return (ACCEPT, None)
+    elif act[0] == 'R':
+        return (REDUCE, int(act.lstrip('R')))
+    elif act[0] == 'S':
+        return (SHIFT, int(act.lstrip('S')))
+    
 class Parser:
     """
     This class parses the token stream outputted from the lexical analyzer 
     into a parse tree or produces errors if the program is malformed.
     """
-    def __init__(self, token_stream, parse_table_file):
+    def __init__(self, token_stream, parse_table_file, source_code):
         """
         Class constructor takes the token stream output from the 
         lexical analyzer as input. Appends $ to the end of the stream.
         """
         self.token_stream = token_stream
+        self.source_code = source_code + " "
         self.parser_table = self.__read_parse_table(parse_table_file)
         # Append the end of file symbol to the end.
         self.token_stream.append(("$", "$"))
+        
+        
 
     def __read_parse_table(self, parse_table_file):
         """
@@ -29,39 +64,28 @@ class Parser:
         @param parse_table_file The file path for the parse table csv file.
         @return A dictionary/map (state, symbol) -> action/goto.
         """
-        # self.token_stream.append(0)
-        table_string = self.__read_file_as_string(parse_table_file)
-        rows = table_string.split('\n')
-        line1data = rows[0].rstrip().split(',')
-        print(line1data)
-        parse_table = {}
-        for i in range(0, len(rows)):
-        # while self.token_stream is not None:
-            line_tuple = rows[i].split(',')
-            state = line_tuple[0]
-            print("state " + state)
-            token = line1data[i]
-            print("token " + token)
-            state = i
-            print(i)
-            token = self.__get_next_token()
-            print(token)
-            x = parse_table[state, token]
-            match x:
-                case ['S', i]:
-                    x.append(i)
-                    x.append(state)
-                case ['R', i]:
-                    L = i + 1
-                    x.pop(L)
-                    Qj = state
-                    x.append(L)
-                    x.append(parse_table[Qj, L])
-                case ["ACCT", i]:
-                    print("Parsing is complete")
-                case None:
-                    print("Error in parsing")
-        return parse_table
+        # This will print out everything inside the source code with ids
+        self.action = dict()
+        self.goto = dict()
+        with open('parse_table.csv') as f:
+            csv = reader(f)
+            symbols = dict()    
+            for row in csv:
+                # this will enumerate all of the symbols into symbols dict
+                if row[0] == 'State':
+                    for i, sym in enumerate(row[1:], start=1):
+                        symbols[i] = sym
+                else:
+                    # checks if states are equal to integers now
+                    state = int(row[0])
+                    
+                    for i, act in enumerate(row[1:], start=1):
+                        sym = symbols[i]
+                        if sym.isupper():
+                            self.goto[(state, sym)] = int(act) if act else None
+                        else:
+                        # calls the get action function and returns stop, accept, reduce or shift
+                            self.action[(state, sym)] = get_action(act)
         # raise NotImplementedError()
 
     def __has_next_token(self):
@@ -82,38 +106,86 @@ class Parser:
         return None
 
     def parse(self):
-        print(self.__get_next_token())
-        self.token_stream.append(0)
-        # raise NotImplementedError()
-    
-    def __read_file_as_string(self, parse_table_file):
-        """
-        Reads the provided file as a string.
-        @param filename: Name of the file to read.
-        @return: A string of the files contents.
-        """
-        with open(parse_table_file, 'r') as file_pointer:
-            return file_pointer.read()
+        print(self.token_stream)
+        # tokens = self.token_stream
+        # individual_token = tokens[0]
+        # # checks inside the token stream for indivual token
+        # print("individual token = " + individual_token[0])
         
-        
-# token = next_token()
+        self.states = [0]
+        self.symbols = [('$',None)]
+        tokens = self.token_stream # Creates a list of all the tokens from the input.
+        i=0
 
-# repeat forever
-#    s = top of stack
-   
-#    if action[s, token] = “shift si” then
-#       PUSH token
-#       PUSH si 
-#       token = next_token()
-      
-#    else if action[s, token] = “reduce A::= β“ then 
-#       POP 2 * |β| symbols
-#       s = top of stack
-#       PUSH A
-#       PUSH goto[s,A]
-      
-#    else if action[s, token] = “accept” then
-#       return
-      
-#    else
-#       error()
+        while True:
+            # Quit if tokens are over and string has not been accepted.
+            if i>len(tokens):
+                print("Stop")
+                return
+
+            individual_token  = tokens[i]
+
+            # Get Action
+            state = self.states[-1]
+            action = self.action[(state, individual_token[1])]
+            print("\nStack: ",self.states)
+            print("Input: ", self.symbols)
+
+            # Action related Logic
+            if action[0] == ACCEPT:
+                print("Accept")
+                return
+            elif action[0] == STOP:
+                print("Stop")
+                return
+            elif action[0] == SHIFT:
+                print("Shift State ", action[1])
+                self.states.append(action[1])
+                self.symbols.append(individual_token)
+                i=i+1
+                continue
+            elif action[0] == REDUCE:
+                print("Reduce Using Production Number: ", action[1])
+                self.reduce_action(action)
+            else:
+                print("There was an error that occured. Please check your grammar")
+    
+        
+        # raise NotImplementedError()
+    def reduce_action(self, action):
+        '''
+        Function to implement reduce logic along with attribute calculations.
+        '''
+        prod_len = len(PRODUCTIONS[action[1]]) - 3 # Length of RHS
+        prod_lhs = PRODUCTIONS[action[1]][0]
+        popped = []
+        # for i in range(prod_len):
+        # print(prod_len)
+        if(action[1] == 3): 
+            self.states.pop(-1)
+            self.states.pop(-1)
+            self.states.pop(-1)
+            popped.insert(0, self.symbols.pop(-1))
+            popped.insert(0, self.symbols.pop(-1))
+            popped.insert(0, self.symbols.pop(-1))
+            self.symbols.append(prod_lhs)
+            
+            self.states.append(9)
+        
+        if(action[1] == 1):
+            self.states.pop(-1)
+            self.states.pop(-1)
+            self.states.pop(-1)
+            popped.insert(0, self.symbols.pop(-1))
+            popped.insert(0, self.symbols.pop(-1))
+            popped.insert(0, self.symbols.pop(-1))
+            
+            self.states.append(1)
+            
+        self.states.pop(-1)
+        popped.insert(0, self.symbols.pop(-1))
+        
+        
+        self.symbols.append((prod_lhs))
+        print('Next State', self.goto[(self.states[-1], prod_lhs)])
+        self.states.append(self.goto[(self.states[-1], prod_lhs)])
