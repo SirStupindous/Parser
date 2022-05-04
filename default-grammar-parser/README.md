@@ -11,5 +11,5 @@ Implement a bottom up parser. The table generated in assignment 1 will be the pa
 You must have a recent version of Python3 installed.
 
 ```
-python3 main.py
+python3 main.py [sourcecode]
 ```
