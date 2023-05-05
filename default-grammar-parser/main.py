@@ -48,7 +48,7 @@ lexical_table[(4, '\t')] = 4
 token_table = {}
 token_table[1] = "id"
 token_table[2] = "+"
-token_table[3] = "-"
+token_table[3] = "="
 token_table[4] = "whitespace"
 
 # Construct the lexer from the parsed file outputs from the parser.
@@ -57,5 +57,5 @@ lexer = Lexer(lexical_table, token_table, source_code)
 token_stream = lexer.perform_analysis()
 
 # Perform the parse.
-parser = Parser(token_stream, "parse_table.csv")
+parser = Parser(token_stream, "parse_table.csv", source_code)
 parser.parse()
